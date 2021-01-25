@@ -41,14 +41,14 @@ class EntrypointLookup implements EntrypointLookupInterface, IntegrityDataProvid
         $this->strictMode = $strictMode;
     }
 
-    public function getJavaScriptFiles(string $entryName): array
+    public function getJavaScriptFiles(string $entryName, $ignoreReturnedFiles = false): array
     {
-        return $this->getEntryFiles($entryName, 'js');
+        return $this->getEntryFiles($entryName, 'js', $ignoreReturnedFiles);
     }
 
-    public function getCssFiles(string $entryName): array
+    public function getCssFiles(string $entryName, $ignoreReturnedFiles = false): array
     {
-        return $this->getEntryFiles($entryName, 'css');
+        return $this->getEntryFiles($entryName, 'css', $ignoreReturnedFiles);
     }
 
     public function getIntegrityData(): array
@@ -70,7 +70,14 @@ class EntrypointLookup implements EntrypointLookupInterface, IntegrityDataProvid
         $this->returnedFiles = [];
     }
 
-    private function getEntryFiles(string $entryName, string $key): array
+    /**
+     * @param string $entryName
+     * @param string $key
+     * @param false $ignoreReturnedFiles
+     *
+     * @return array
+     */
+    private function getEntryFiles(string $entryName, string $key, $ignoreReturnedFiles = false): array
     {
         $this->validateEntryName($entryName);
         $entriesData = $this->getEntriesData();
@@ -83,6 +90,11 @@ class EntrypointLookup implements EntrypointLookupInterface, IntegrityDataProvid
 
         // make sure to not return the same file multiple times
         $entryFiles = $entryData[$key];
+
+        if ($ignoreReturnedFiles) {
+            return $entryFiles;
+        }
+
         $newFiles = array_values(array_diff($entryFiles, $this->returnedFiles));
         $this->returnedFiles = array_merge($this->returnedFiles, $newFiles);
 

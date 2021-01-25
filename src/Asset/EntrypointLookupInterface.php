@@ -17,12 +17,12 @@ interface EntrypointLookupInterface extends ResetInterface
     /**
      * @throws EntrypointNotFoundException if an entry name is passed that does not exist in entrypoints.json
      */
-    public function getJavaScriptFiles(string $entryName): array;
+    public function getJavaScriptFiles(string $entryName, $ignoreReturnedFiles = false): array;
 
     /**
      * @throws EntrypointNotFoundException if an entry name is passed that does not exist in entrypoints.json
      */
-    public function getCssFiles(string $entryName): array;
+    public function getCssFiles(string $entryName, $ignoreReturnedFiles = false): array;
 
     /**
      * Resets the state of this service.

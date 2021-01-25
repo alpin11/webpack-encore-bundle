@@ -36,7 +36,8 @@ class TagRenderer implements ResetInterface
         array $defaultScriptAttributes = [],
         array $defaultLinkAttributes = [],
         EventDispatcherInterface $eventDispatcher = null
-    ) {
+    )
+    {
         if ($entrypointLookupCollection instanceof EntrypointLookupInterface) {
             @trigger_error(sprintf('The "$entrypointLookupCollection" argument in method "%s()" must be an instance of EntrypointLookupCollection.', __METHOD__), E_USER_DEPRECATED);
 
@@ -135,6 +136,47 @@ class TagRenderer implements ResetInterface
         return implode('', $scriptTags);
     }
 
+    public function renderWebpackPreloadTags(string $entryName, string $packageName = null, string $entrypointName = null, array $extraAttributes = []): string
+    {
+        $entrypointName = $entrypointName ?: '_default';
+        $preloadTags = [];
+        $entryPointLookup = $this->getEntrypointLookup($entrypointName);
+        $baseAttributes = [
+            'rel' => 'preload'
+        ];
+
+        foreach ($entryPointLookup->getJavaScriptFiles($entryName, true) as $filename) {
+            $attributes = [];
+            $attributes['as'] = 'style';
+            $attributes['href'] = $this->getAssetPath($filename, $packageName);
+            $attributes = array_merge($attributes, $baseAttributes, $extraAttributes);
+
+            $preloadTags[] = sprintf(
+                '<link %s>',
+                $this->convertArrayToAttributes($attributes)
+            );
+
+            $this->renderedFiles['preload'][] = $attributes['href'];
+        }
+
+        foreach ($entryPointLookup->getCssFiles($entryName, true) as $filename) {
+            $attributes = [];
+            $attributes['as'] = 'script';
+            $attributes['href'] = $this->getAssetPath($filename, $packageName);
+            $attributes = array_merge($attributes, $baseAttributes, $extraAttributes);
+
+            $preloadTags[] = sprintf(
+                '<link %s>',
+                $this->convertArrayToAttributes($attributes)
+            );
+
+            $this->renderedFiles['preload'][] = $attributes['href'];
+        }
+
+        return implode('', $preloadTags);
+    }
+
+
     public function getRenderedScripts(): array
     {
         return $this->renderedFiles['scripts'];
@@ -155,6 +197,7 @@ class TagRenderer implements ResetInterface
         $this->renderedFiles = [
             'scripts' => [],
             'styles' => [],
+            'preload' => []
         ];
     }
 

@@ -31,6 +31,7 @@ final class EntryFilesTwigExtension extends AbstractExtension
             new TwigFunction('encore_entry_css_files', [$this, 'getWebpackCssFiles']),
             new TwigFunction('encore_entry_script_tags', [$this, 'renderWebpackScriptTags'], ['is_safe' => ['html']]),
             new TwigFunction('encore_entry_link_tags', [$this, 'renderWebpackLinkTags'], ['is_safe' => ['html']]),
+            new TwigFunction('encore_entry_preload_tags', [$this, 'renderWebpackPreloadTags'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -56,6 +57,12 @@ final class EntryFilesTwigExtension extends AbstractExtension
     {
         return $this->getTagRenderer()
             ->renderWebpackLinkTags($entryName, $packageName, $entrypointName, $attributes);
+    }
+
+    public function renderWebpackPreloadTags(string $entryName, string $packageName = null, string $entrypointName = '_default', array $attributes = []): string
+    {
+        return $this->getTagRenderer()
+            ->renderWebpackPreloadTags($entryName, $packageName, $entrypointName, $attributes);
     }
 
     private function getEntrypointLookup(string $entrypointName): EntrypointLookupInterface
